@@ -11,11 +11,6 @@ app.use(express.urlencoded({ extended: true }));
 // Servir arquivos estáticos da pasta public
 app.use(express.static(path.join(__dirname, '../public')));
 
-// Rota principal - serve o index.html
-app.get('/', (req, res) => {
-    res.sendFile(path.join(__dirname, '../public/index.html'));
-});
-
 // Endpoint de teste para verificar se o servidor está funcionando
 app.get('/api/status', (req, res) => {
     res.json({

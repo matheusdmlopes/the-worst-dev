@@ -22,14 +22,81 @@
             </div>
 
             <form id="registration-form">
-                <!-- Formulário será implementado na Fase 2 -->
-                <p>Formulário de inscrição em construção... Volte em breve para garantir sua vaga na competição!</p>
+                <div class="form-group">
+                    <label for="name">Nome Completo:<span class="required">*</span></label>
+                    <input type="text" id="name" name="name" required>
+                    <div class="field-error" id="name-error"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="email">E-mail:<span class="required">*</span></label>
+                    <input type="email" id="email" name="email" required>
+                    <div class="field-error" id="email-error"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="birthdate">Data de Nascimento:<span class="required">*</span></label>
+                    <input type="date" id="birthdate" name="birthdate" required>
+                    <div class="field-error" id="birthdate-error"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="experience">Anos de Experiência:<span class="required">*</span></label>
+                    <input type="number" id="experience" name="experience" min="0" max="50" required>
+                    <div class="field-error" id="experience-error"></div>
+                </div>
+
+                <div class="form-group">
+                    <label for="language">Linguagem de Programação Favorita:<span class="required">*</span></label>
+                    <select id="language" name="language" required>
+                        <option value="">Selecione uma linguagem</option>
+                        <option value="javascript">JavaScript</option>
+                        <option value="python">Python</option>
+                        <option value="java">Java</option>
+                        <option value="csharp">C#</option>
+                        <option value="php">PHP</option>
+                        <option value="ruby">Ruby</option>
+                        <option value="cpp">C++</option>
+                        <option value="other">Outra</option>
+                    </select>
+                    <div class="field-error" id="language-error"></div>
+                </div>
+
+                <div class="form-group">
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="terms" name="terms" required>
+                        Eu concordo com os <a href="#" id="terms-link">Termos de Uso</a> e entendo que meus dados serão
+                        processados de maneira absurda.
+                    </label>
+                    <div class="field-error" id="terms-error"></div>
+                </div>
+
+                <div class="form-buttons">
+                    <button type="submit" id="submit-button">Enviar Inscrição</button>
+                    <button type="reset" id="reset-button">Limpar Formulário</button>
+                </div>
             </form>
         </main>
 
         <footer>
             <p>&copy; 2025 Competição: O Pior Programador do Mundo. Todos os direitos reservados (ou não).</p>
         </footer>
+    </div>
+
+    <div id="terms-modal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Termos de Uso Absurdos</h2>
+            <p>Ao se inscrever nesta competição, você concorda com o seguinte:</p>
+            <ol>
+                <li>Seu código será julgado pela sua capacidade de ser incompreensível e ineficiente.</li>
+                <li>Você será avaliado pela sua habilidade de frustrar outros desenvolvedores.</li>
+                <li>Todo bug será considerado uma "feature especial".</li>
+                <li>Quanto mais erros seu código tiver, mais pontos você ganha.</li>
+                <li>Comentários no código serão penalizados, a menos que sejam completamente enganosos.</li>
+            </ol>
+            <button id="accept-terms">Aceito estes termos absurdos</button>
+        </div>
     </div>
 
     <script src="js/main.js"></script>
