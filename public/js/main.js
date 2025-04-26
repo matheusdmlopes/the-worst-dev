@@ -1,4 +1,4 @@
-// Script principal para "The Worst Dev"
+// Script principal
 
 document.addEventListener('DOMContentLoaded', () => {
     console.log('Aplicação inicializada');
@@ -41,7 +41,7 @@ function setupFormHandlers() {
 }
 
 /**
- * Simula a validação do formulário - sempre encontra erros
+ * Simula a validação do formulário
  */
 function validateForm() {
     let errorCount = 0;
