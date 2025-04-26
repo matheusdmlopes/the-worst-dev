@@ -64,7 +64,7 @@ function validateForm() {
             'Não aceitamos mais candidatos com esta experiência.',
         ],
         language: [
-            'Já atingimos o limite de programadores desta linguagem.'
+            'segmentation fault (core dumped)'
         ],
         terms: [
             'Você precisa aceitar novamente os termos.'

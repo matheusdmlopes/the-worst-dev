@@ -1,54 +1,47 @@
 # O Pior Programador do Mundo
 
-Um projeto humorístico que simula um formulário de inscrição para a competição do "Pior Programador do Mundo". O formulário é intencionalmente frustrante, cheio de erros e validações absurdas.
+Um projeto humorístico que simula um formulário de inscrição para a competição de "Pior Programador do Mundo".
 
 ## Sobre o Projeto
 
-Este é um site satírico com um formulário de inscrição que sempre encontra "problemas" com os dados do usuário, independentemente do que seja inserido. As mensagens de erro são intencionalmente absurdas e humorísticas, simulando o que seria criado pelo pior desenvolvedor do mundo.
+Este é um site satírico com um formulário de inscrição que sempre encontra "problemas" com os dados do usuário, independentemente do que seja inserido. As mensagens de erro são sátiras de erros comuns que um programador comum pode cometer, simulando o que seria criado pelo pior desenvolvedor do mundo.
+
+## Características do Projeto
+
+- **Formulário**: Validações que nunca permitem o cadastro com sucesso
+- **Interface Responsiva**: Funciona em dispositivos móveis e desktop
+- **Tema Escuro**: Design moderno com tema escuro por padrão
+- **Puramente Estático**: Não requer backend ou banco de dados
 
 ## Tecnologias Utilizadas
 
-- HTML, CSS e JavaScript para o frontend
-- Node.js e Express para o backend simples
-- Sem banco de dados (armazenamento em memória ou arquivo JSON)
+- HTML5, CSS3 e JavaScript puro (vanilla)
+- Nenhuma dependência ou biblioteca externa
+- Site completamente estático
 
-## Como Executar
+## Como Executar Localmente
 
-1. Clone o repositório
-2. Instale as dependências:
-   ```
-   npm install
-   ```
-3. Execute o servidor em modo de desenvolvimento:
-   ```
-   npm run dev
-   ```
-4. Acesse `http://localhost:3000` no navegador
+Por ser um site estático, você pode simplesmente:
+
+1. Clonar o repositório
+2. Abrir o arquivo `public/index.html` em qualquer navegador moderno
 
 ## Estrutura do Projeto
 
 ```
 the-worst-dev/
-├── public/           # Arquivos estáticos (HTML, CSS, JS)
-│   ├── css/          # Estilos
-│   ├── js/           # Scripts
+├── public/           # Arquivos estáticos
+│   ├── css/          # Estilos (incluindo tema escuro)
+│   │   └── styles.css
+│   ├── js/           # Scripts JavaScript
+│   │   └── main.js
 │   └── index.html    # Página principal
-├── server/           # Código do servidor
-│   └── server.js     # Configuração do Express
-├── src/              # Código fonte adicional
-├── package.json      # Configuração do projeto
-└── README.md         # Documentação
+└── README.md         # Esta documentação
 ```
 
 ## Status do Projeto
 
-Fase 1 (Setup Inicial) - Concluída ✅
-- Estrutura básica de pastas criada
-- Servidor Express configurado
-- Páginas iniciais implementadas
-
-## Próximos Passos
-
-- Implementar o formulário completo de inscrição (Fase 2)
-- Desenvolver lógica de erros engraçados (Fase 3)
-- Adicionar recursos humorísticos (Fase 4) 
+✅ Fase 1: Configuração Inicial - Concluída
+✅ Fase 2: Desenvolvimento - Concluída  
+✅ Fase 3: Estilização e Tema Escuro - Concluída
+✅ Fase 4: Preparação para Deploy - Concluída
