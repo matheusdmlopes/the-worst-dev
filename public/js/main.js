@@ -60,7 +60,7 @@ function validateForm() {
             'Esta data de nascimento já atingiu a cota máxima de inscrições.',
         ],
         experience: [
-            'Este número de anos de experiência já foi utilizado.',
+            'Este número de anos de experiência já foi utilizado por outro inscrito.',
             'Não aceitamos mais candidatos com esta experiência.',
         ],
         language: [
