@@ -128,13 +128,20 @@ function setupTermsModal() {
     const closeBtn = document.querySelector('.close');
     const acceptBtn = document.getElementById('accept-terms');
     const refreshBtn = document.getElementById('refresh-terms');
+    const modalContent = document.querySelector('.modal-content');
+
+    // Usar uma variável que persista entre aberturas do modal
+    // Se não existir, inicializa com 0
+    if (!window.termsAttemptCount) {
+        window.termsAttemptCount = 0;
+    }
+
+    // Referência ao contador para facilitar a leitura
+    let attemptCount = window.termsAttemptCount;
+    const maxAttempts = 3;
 
     // Garantir que o modal esteja inicialmente oculto
     modal.style.display = 'none';
-
-    // Contador de tentativas para mensagens de erro cada vez mais absurdas
-    let attemptCount = 0;
-    const maxAttempts = 3;
 
     // Mensagens de erro que ficam piores a cada tentativa
     const errorMessages = [
@@ -164,9 +171,52 @@ Stack Trace:
 
     const errorCodes = ['500', '400', '418'];
 
+    // Função para atualizar o estado do modal com base no nível atual
+    function updateModalState() {
+        const errorDetails = document.querySelector('.error-details');
+        const stackTrace = document.querySelector('.stack-trace');
+        const errorCode = document.querySelector('.error-code');
+
+        // Verificar se os elementos existem antes de atualizar
+        if (errorDetails && stackTrace && errorCode) {
+            // Atualizar a mensagem de erro e stack trace com base no attemptCount
+            const index = Math.min(attemptCount, maxAttempts - 1);
+            errorDetails.textContent = errorMessages[index];
+            stackTrace.textContent = stackTraces[index];
+            errorCode.textContent = errorCodes[index];
+
+            // Se estiver no último nível (loading)
+            if (attemptCount >= maxAttempts - 1) {
+                // Desabilitar todos os botões
+                document.querySelectorAll('#terms-modal button').forEach(btn => {
+                    btn.disabled = true;
+                });
+
+                // Configurar o botão "Tentar novamente"
+                if (refreshBtn) {
+                    refreshBtn.disabled = true;
+                    refreshBtn.textContent = 'Servidor não está respondendo';
+                }
+
+                // Adicionar efeito de cursor de loading
+                modalContent.classList.add('loading-cursor', 'modal-frozen');
+
+                // Atualizar o título com "Não respondendo"
+                const headerTitle = document.querySelector('.error-header h2');
+                if (headerTitle) {
+                    headerTitle.innerHTML = `<span class="error-code">${errorCodes[index]}</span> Internal Server Error <span class="not-responding">(Não respondendo)</span>`;
+                }
+            }
+        }
+    }
+
     termsLink.addEventListener('click', (e) => {
         e.preventDefault();
         modal.style.display = 'block';
+
+        // Atualizar o estado do modal quando aberto
+        updateModalState();
+
         console.log('Modal de termos aberto');
     });
 
@@ -175,8 +225,8 @@ Stack Trace:
         if (Math.random() < 0.6) {
             showErrorNotification("Botão de fechar não está respondendo. Tente usar ESC.");
         } else {
-            attemptCount = 0; // Reset contador ao fechar com sucesso
             modal.style.display = 'none';
+            // NÃO resetamos o contador ao fechar
         }
     });
 
@@ -184,7 +234,7 @@ Stack Trace:
         // 50% de chance de não fechar o modal
         if (Math.random() > 0.5) {
             modal.style.display = 'none';
-            attemptCount = 0; // Reset contador
+            // NÃO resetamos o contador ao fechar
         } else {
             // Mudar o texto do botão
             acceptBtn.textContent = 'Aceitando...';
@@ -205,38 +255,18 @@ Stack Trace:
 
     if (refreshBtn) {
         refreshBtn.addEventListener('click', () => {
-            // Quando o usuário tentar novamente, mostrar erros progressivamente piores
-            const errorDetails = document.querySelector('.error-details');
-            const stackTrace = document.querySelector('.stack-trace');
-            const errorCode = document.querySelector('.error-code');
-            const modalContent = document.querySelector('.modal-content');
+            // Se já estiver no nível máximo, não fazer nada
+            if (attemptCount >= maxAttempts - 1) return;
 
+            // Incrementar o contador e atualizar a variável global
             attemptCount = Math.min(attemptCount + 1, maxAttempts - 1);
+            window.termsAttemptCount = attemptCount;
 
-            // Atualizar a mensagem de erro e stack trace
-            errorDetails.textContent = errorMessages[attemptCount];
-            stackTrace.textContent = stackTraces[attemptCount];
-            errorCode.textContent = errorCodes[attemptCount];
+            // Atualizar o estado do modal
+            updateModalState();
 
-            // Se for o último erro (terceira tentativa), mostrar cursor de loading e fechar o modal
+            // Se for o último erro (terceira tentativa), simular o travamento
             if (attemptCount >= maxAttempts - 1) {
-                // Desabilitar o botão de tentar novamente
-                refreshBtn.disabled = true;
-                refreshBtn.textContent = 'Servidor não está respondendo';
-
-                // Adicionar efeito de cursor de loading
-                modalContent.classList.remove('glitch');
-                modalContent.classList.add('loading-cursor', 'modal-frozen');
-
-                // Desabilitar todos os botões e campos no modal
-                document.querySelectorAll('#terms-modal button').forEach(btn => {
-                    btn.disabled = true;
-                });
-
-                // Adicionar título de "não respondendo" no modal
-                const headerTitle = document.querySelector('.error-header h2');
-                headerTitle.innerHTML = `<span class="error-code">${errorCodes[attemptCount]}</span> Internal Server Error <span class="not-responding">(Não respondendo)</span>`;
-
                 // Revelar uma "pista" engraçada no console
                 console.log("%c🧠 DICA SECRETA: Não existe termos de uso de verdade!", "color:red; font-size:20px; font-weight:bold");
 
@@ -248,18 +278,8 @@ Stack Trace:
                     // Fechar o modal após mostrar a notificação
                     setTimeout(() => {
                         modal.style.display = 'none';
-                        attemptCount = 0; // Reset para próxima vez
 
-                        // Remover classes para a próxima vez
-                        modalContent.classList.remove('loading-cursor', 'modal-frozen');
-
-                        // Reativar botões para a próxima abertura
-                        document.querySelectorAll('#terms-modal button').forEach(btn => {
-                            btn.disabled = false;
-                        });
-
-                        // Resetar o refreshBtn
-                        refreshBtn.textContent = 'Tentar novamente';
+                        // NÃO resetamos o contador nem removemos as classes
                     }, 1000);
                 }, 4000);
             }
@@ -270,7 +290,7 @@ Stack Trace:
     window.addEventListener('click', (e) => {
         if (e.target === modal) {
             modal.style.display = 'none';
-            attemptCount = 0; // Reset contador
+            // NÃO resetamos o contador ao fechar
         }
     });
 
@@ -278,8 +298,13 @@ Stack Trace:
     window.addEventListener('keydown', (e) => {
         if (e.key === 'Escape' && modal.style.display === 'block') {
             modal.style.display = 'none';
-            attemptCount = 0; // Reset contador
+            // NÃO resetamos o contador ao fechar
         }
+    });
+
+    // Adicionar um listener para reset quando a página for recarregada
+    window.addEventListener('beforeunload', () => {
+        window.termsAttemptCount = 0;
     });
 }
 
