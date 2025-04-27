@@ -57,11 +57,10 @@ function validateForm() {
         ],
         birthdate: [
             'Já existe um inscrito com esta data de nascimento.',
-            'Esta data de nascimento já atingiu a cota máxima de inscrições.',
         ],
         experience: [
             'Este número de anos de experiência já foi utilizado por outro inscrito.',
-            'Não aceitamos mais candidatos com esta experiência.',
+            'Ano incorreto, tente novamente.',
         ],
         language: [
             'segmentation fault (core dumped)'
