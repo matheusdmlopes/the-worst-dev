@@ -16,6 +16,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Estado dos valores anteriores dos campos
     window.previousFieldValues = {};
+
+    // Flag para indicar se o usuário alterou o campo com erro
+    window.hasChangedErrorField = false;
 });
 
 /**
@@ -32,6 +35,19 @@ function setupFormHandlers() {
             if (!window.previousFieldValues[field.id]) {
                 window.previousFieldValues[field.id] = field.value;
             }
+
+            // Se este for o campo com erro e o valor mudou, marcar que o usuário alterou o campo com erro
+            if (window.lastErrorField === field.id && field.value !== window.previousFieldValues[field.id]) {
+                window.hasChangedErrorField = true;
+            }
+        });
+
+        // Também monitorar eventos de input para capturar mudanças em tempo real
+        field.addEventListener('input', (e) => {
+            // Se este for o campo com erro e o valor mudou, marcar que o usuário alterou o campo com erro
+            if (window.lastErrorField === field.id && field.value !== window.previousFieldValues[field.id]) {
+                window.hasChangedErrorField = true;
+            }
         });
     });
 
@@ -39,8 +55,33 @@ function setupFormHandlers() {
     form.addEventListener('submit', (e) => {
         e.preventDefault();
 
-        // Limpar mensagens de erro anteriores
-        clearAllErrors();
+        // Armazenar a mensagem de erro atual do campo com erro antes de limpar
+        let currentFieldErrorMessage = '';
+        if (window.lastErrorField) {
+            const errorElement = document.getElementById(`${window.lastErrorField}-error`);
+            if (errorElement) {
+                currentFieldErrorMessage = errorElement.textContent;
+            }
+        }
+
+        // Limpar mensagens de erro gerais, mas não a do campo específico ainda
+        const errorContainer = document.getElementById('error-container');
+        errorContainer.textContent = '';
+        errorContainer.classList.add('hidden');
+
+        // Não limpar os erros dos campos individuais se o usuário não alterou o campo com erro
+        if (window.lastErrorField && !window.hasChangedErrorField) {
+            // Manter apenas o erro do campo atual, limpar os outros
+            const allErrorElements = document.querySelectorAll('.field-error');
+            allErrorElements.forEach(element => {
+                if (element.id !== `${window.lastErrorField}-error`) {
+                    element.textContent = '';
+                }
+            });
+        } else {
+            // Limpar todos os erros de campo
+            clearFieldErrors();
+        }
 
         // Mostrar um indicador visual de "processando" para dar a impressão de validação
         const submitButton = document.getElementById('submit-button');
@@ -71,8 +112,24 @@ function setupFormHandlers() {
                 }
             }
 
-            // Simulação de validação - sempre encontra um erro
-            validateForm();
+            // Se o usuário não alterou o campo com erro, manter o mesmo erro
+            // Se não temos um campo de erro ou o usuário alterou o campo com erro, gerar um novo erro
+            if (!window.lastErrorField || window.hasChangedErrorField) {
+                // Simular validação - sempre encontra um erro
+                validateForm();
+
+                // Resetar o flag
+                window.hasChangedErrorField = false;
+            } else {
+                // Manter o mesmo erro no campo específico
+                const errorElement = document.getElementById(`${window.lastErrorField}-error`);
+                if (errorElement && currentFieldErrorMessage) {
+                    errorElement.textContent = currentFieldErrorMessage;
+                }
+
+                // Mostrar a mensagem de erro geral novamente
+                showError(`Seu formulário contém 1 erro que precisa ser corrigido.`);
+            }
 
             // Armazenar os valores atuais dos campos após a validação
             updatePreviousFieldValues();
@@ -93,6 +150,9 @@ function setupFormHandlers() {
             showError('Desculpe, o botão de limpar está temporariamente indisponível');
         } else {
             clearAllErrors();
+            // Reset o último campo de erro e o flag
+            window.lastErrorField = null;
+            window.hasChangedErrorField = false;
         }
     });
 }
@@ -281,6 +341,13 @@ function clearAllErrors() {
     errorContainer.textContent = '';
     errorContainer.classList.add('hidden');
 
+    clearFieldErrors();
+}
+
+/**
+ * Limpa apenas os erros dos campos individuais
+ */
+function clearFieldErrors() {
     const errorElements = document.querySelectorAll('.field-error');
     errorElements.forEach(element => {
         element.textContent = '';
