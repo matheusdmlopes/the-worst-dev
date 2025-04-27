@@ -171,6 +171,49 @@ Stack Trace:
 
     const errorCodes = ['500', '400', '418'];
 
+    // Função para criar e exibir o carregamento inicial
+    function showInitialLoading() {
+        // Criar elemento de carregamento
+        const loadingElement = document.createElement('div');
+        loadingElement.className = 'initial-loading';
+
+        // Adicionar spinner e texto
+        loadingElement.innerHTML = `
+            <div class="loading-spinner"></div>
+            <div class="loading-text">Carregando termos de uso...</div>
+        `;
+
+        // Adicionar ao modal
+        modalContent.appendChild(loadingElement);
+
+        // Esconder o conteúdo principal do modal temporariamente
+        const errorHeader = document.querySelector('.error-header');
+        const errorBody = document.querySelector('.error-body');
+
+        if (errorHeader) errorHeader.style.visibility = 'hidden';
+        if (errorBody) errorBody.style.visibility = 'hidden';
+
+        // Remover o carregamento após 1.5 segundos e mostrar o conteúdo
+        setTimeout(() => {
+            // Verificar se o elemento ainda existe (pode ter sido removido se o modal for fechado rapidamente)
+            if (document.contains(loadingElement)) {
+                // Remover com fade out
+                loadingElement.style.opacity = '0';
+                loadingElement.style.transition = 'opacity 0.3s';
+
+                setTimeout(() => {
+                    if (document.contains(loadingElement)) {
+                        loadingElement.remove();
+
+                        // Mostrar conteúdo
+                        if (errorHeader) errorHeader.style.visibility = 'visible';
+                        if (errorBody) errorBody.style.visibility = 'visible';
+                    }
+                }, 300);
+            }
+        }, 1500);
+    }
+
     // Função para atualizar o estado do modal com base no nível atual
     function updateModalState() {
         const errorDetails = document.querySelector('.error-details');
@@ -212,7 +255,14 @@ Stack Trace:
 
     termsLink.addEventListener('click', (e) => {
         e.preventDefault();
+
+        // Exibir o modal
         modal.style.display = 'block';
+
+        // Mostrar carregamento inicial (apenas se não estiver no último nível com loading)
+        if (attemptCount < maxAttempts - 1) {
+            showInitialLoading();
+        }
 
         // Atualizar o estado do modal quando aberto
         updateModalState();
