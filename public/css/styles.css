@@ -488,3 +488,90 @@ footer {
     font-size: 1rem;
     color: var(--text-color);
 }
+
+/* Adicionando estilos para o modal de sucesso */
+.success-screen {
+    background-color: #ffffff;
+    border-radius: 8px;
+    border: 2px solid #28a745;
+    max-width: 500px;
+    margin: 10% auto;
+    padding: 20px;
+    position: relative;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
+}
+
+.success-header {
+    border-bottom: 1px solid #e8f5e9;
+    padding-bottom: 10px;
+    text-align: center;
+    margin-bottom: 20px;
+}
+
+.success-header h2 {
+    color: #28a745;
+    margin: 0;
+    font-size: 24px;
+}
+
+.success-body {
+    text-align: center;
+    padding: 10px 0;
+}
+
+.success-icon {
+    font-size: 48px;
+    margin-bottom: 15px;
+}
+
+.success-message-large {
+    font-size: 20px;
+    font-weight: bold;
+    color: #28a745;
+    margin-bottom: 15px;
+}
+
+.success-details {
+    color: #555;
+    font-size: 16px;
+    line-height: 1.5;
+    margin-bottom: 15px;
+}
+
+.success-actions {
+    margin-top: 25px;
+}
+
+.success-actions button {
+    background-color: #28a745;
+    border: none;
+    border-radius: 4px;
+    color: white;
+    cursor: pointer;
+    font-size: 16px;
+    padding: 10px 24px;
+    transition: background-color 0.3s;
+}
+
+.success-actions button:hover {
+    background-color: #218838;
+}
+
+/* Animação para o modal de sucesso */
+@keyframes successPulse {
+    0% {
+        transform: scale(1);
+    }
+
+    50% {
+        transform: scale(1.05);
+    }
+
+    100% {
+        transform: scale(1);
+    }
+}
+
+#success-modal .modal-content {
+    animation: successPulse 1s ease-in-out;
+}

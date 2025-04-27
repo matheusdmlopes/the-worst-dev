@@ -10,6 +10,12 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Inicializar a variável para rastrear o último campo com erro
     window.lastErrorField = null;
+
+    // Contador de tentativas válidas de corrigir erros
+    window.validAttempts = 0;
+
+    // Estado dos valores anteriores dos campos
+    window.previousFieldValues = {};
 });
 
 /**
@@ -18,6 +24,16 @@ document.addEventListener('DOMContentLoaded', () => {
 function setupFormHandlers() {
     const form = document.getElementById('registration-form');
     const resetButton = document.getElementById('reset-button');
+
+    // Adicionar listener para detectar mudanças nos campos de entrada
+    form.querySelectorAll('input, select').forEach(field => {
+        field.addEventListener('change', (e) => {
+            // Armazenar o valor atual para checar depois se foi alterado
+            if (!window.previousFieldValues[field.id]) {
+                window.previousFieldValues[field.id] = field.value;
+            }
+        });
+    });
 
     // Manipulador de evento para envio do formulário
     form.addEventListener('submit', (e) => {
@@ -35,8 +51,31 @@ function setupFormHandlers() {
 
         // Adicionar um pequeno delay para dar a impressão de que está validando
         setTimeout(() => {
+            // Verificar se o usuário alterou o campo com erro anterior
+            const didUserFixLastError = checkIfUserFixedLastError();
+
+            // Se o usuário alterou o campo do último erro e preencheu todos os campos obrigatórios
+            if (didUserFixLastError && areAllFieldsFilled()) {
+                window.validAttempts++;
+
+                // Se atingiu 9 tentativas, mostrar o easter egg de sucesso
+                if (window.validAttempts >= 9) {
+                    showSuccessModal();
+
+                    // Restaurar o botão de envio
+                    if (submitButton) {
+                        submitButton.disabled = false;
+                        submitButton.textContent = 'Enviar Inscrição';
+                    }
+                    return;
+                }
+            }
+
             // Simulação de validação - sempre encontra um erro
             validateForm();
+
+            // Armazenar os valores atuais dos campos após a validação
+            updatePreviousFieldValues();
 
             // Restaurar o botão de envio
             if (submitButton) {
@@ -54,6 +93,112 @@ function setupFormHandlers() {
             showError('Desculpe, o botão de limpar está temporariamente indisponível');
         } else {
             clearAllErrors();
+        }
+    });
+}
+
+/**
+ * Verifica se o usuário alterou o campo que tinha erro anteriormente
+ */
+function checkIfUserFixedLastError() {
+    if (!window.lastErrorField || !window.previousFieldValues[window.lastErrorField]) {
+        return false;
+    }
+
+    const field = document.getElementById(window.lastErrorField);
+    if (!field) return false;
+
+    // Comparar o valor atual com o valor anterior
+    return field.value !== window.previousFieldValues[window.lastErrorField];
+}
+
+/**
+ * Verifica se todos os campos obrigatórios estão preenchidos
+ */
+function areAllFieldsFilled() {
+    const requiredFields = document.querySelectorAll('[required]');
+    for (const field of requiredFields) {
+        if (!field.value) return false;
+
+        // Verificação especial para checkbox
+        if (field.type === 'checkbox' && !field.checked) return false;
+    }
+    return true;
+}
+
+/**
+ * Atualiza o registro dos valores anteriores dos campos
+ */
+function updatePreviousFieldValues() {
+    const fields = document.querySelectorAll('input, select');
+    fields.forEach(field => {
+        window.previousFieldValues[field.id] = field.value;
+    });
+}
+
+/**
+ * Mostra o modal de sucesso (easter egg)
+ */
+function showSuccessModal() {
+    // Criar o modal de sucesso
+    const successModal = document.createElement('div');
+    successModal.className = 'modal';
+    successModal.id = 'success-modal';
+    successModal.style.display = 'block';
+
+    // Conteúdo do modal
+    successModal.innerHTML = `
+        <div class="modal-content success-screen">
+            <span class="close">&times;</span>
+            <div class="success-header">
+                <h2>🎉 Parabéns! 🎉</h2>
+            </div>
+            <div class="success-body">
+                <div class="success-icon">✅</div>
+                <p class="success-message-large">Sua inscrição foi enviada com sucesso!</p>
+                <p class="success-details">Uau! Você conseguiu! Após 9 tentativas genuínas, provamos que você é realmente persistente.</p>
+                <p class="success-details">Você acaba de encontrar o easter egg da página! Sua determinação é admirável.</p>
+                <div class="success-actions">
+                    <button id="close-success">Fechar</button>
+                </div>
+            </div>
+        </div>
+    `;
+
+    // Adicionar ao DOM
+    document.body.appendChild(successModal);
+
+    // Configurar eventos do modal
+    const closeBtn = successModal.querySelector('.close');
+    const closeButton = successModal.querySelector('#close-success');
+
+    // Função para fechar o modal
+    const closeModal = () => {
+        successModal.style.display = 'none';
+        document.body.removeChild(successModal);
+
+        // Reset do contador de tentativas para nova chance
+        window.validAttempts = 0;
+        window.lastErrorField = null;
+        window.previousFieldValues = {};
+        clearAllErrors();
+    };
+
+    // Configurar os eventos de fechar
+    closeBtn.addEventListener('click', closeModal);
+    closeButton.addEventListener('click', closeModal);
+
+    // Fechar se clicar fora do modal
+    window.addEventListener('click', (e) => {
+        if (e.target === successModal) {
+            closeModal();
+        }
+    });
+
+    // Fechar com ESC
+    window.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape' && successModal.style.display === 'block') {
+            closeModal();
         }
     });
 }
