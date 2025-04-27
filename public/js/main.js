@@ -209,6 +209,7 @@ Stack Trace:
             const errorDetails = document.querySelector('.error-details');
             const stackTrace = document.querySelector('.stack-trace');
             const errorCode = document.querySelector('.error-code');
+            const modalContent = document.querySelector('.modal-content');
 
             attemptCount = Math.min(attemptCount + 1, maxAttempts - 1);
 
@@ -217,24 +218,50 @@ Stack Trace:
             stackTrace.textContent = stackTraces[attemptCount];
             errorCode.textContent = errorCodes[attemptCount];
 
-            // Se for o último erro, desabilitar o botão de tentar novamente
+            // Se for o último erro (terceira tentativa), mostrar cursor de loading e fechar o modal
             if (attemptCount >= maxAttempts - 1) {
+                // Desabilitar o botão de tentar novamente
                 refreshBtn.disabled = true;
-                refreshBtn.textContent = 'Servidor indisponível';
+                refreshBtn.textContent = 'Servidor não está respondendo';
 
-                // Fechar o modal após 3 segundos para mais frustração
-                setTimeout(() => {
-                    modal.style.display = 'none';
-                    attemptCount = 0; // Reset para próxima vez
-                }, 3000);
-            }
+                // Adicionar efeito de cursor de loading
+                modalContent.classList.remove('glitch');
+                modalContent.classList.add('loading-cursor', 'modal-frozen');
 
-            // Adicionar efeito de glitch ao atingir o último nível
-            if (attemptCount === maxAttempts - 1) {
-                document.querySelector('.modal-content').classList.add('glitch');
+                // Desabilitar todos os botões e campos no modal
+                document.querySelectorAll('#terms-modal button').forEach(btn => {
+                    btn.disabled = true;
+                });
+
+                // Adicionar título de "não respondendo" no modal
+                const headerTitle = document.querySelector('.error-header h2');
+                headerTitle.innerHTML = `<span class="error-code">${errorCodes[attemptCount]}</span> Internal Server Error <span class="not-responding">(Não respondendo)</span>`;
 
                 // Revelar uma "pista" engraçada no console
-                console.log("%c🧠 DICA: Não existe termos de uso de verdade!", "color:red; font-size:20px; font-weight:bold");
+                console.log("%c🧠 DICA SECRETA: Não existe termos de uso de verdade!", "color:red; font-size:20px; font-weight:bold");
+
+                // Esperar alguns segundos e fechar o modal
+                setTimeout(() => {
+                    // Simular uma mensagem de crash antes de fechar
+                    showErrorNotification("A janela de termos de uso parou de responder e será fechada");
+
+                    // Fechar o modal após mostrar a notificação
+                    setTimeout(() => {
+                        modal.style.display = 'none';
+                        attemptCount = 0; // Reset para próxima vez
+
+                        // Remover classes para a próxima vez
+                        modalContent.classList.remove('loading-cursor', 'modal-frozen');
+
+                        // Reativar botões para a próxima abertura
+                        document.querySelectorAll('#terms-modal button').forEach(btn => {
+                            btn.disabled = false;
+                        });
+
+                        // Resetar o refreshBtn
+                        refreshBtn.textContent = 'Tentar novamente';
+                    }, 1000);
+                }, 4000);
             }
         });
     }

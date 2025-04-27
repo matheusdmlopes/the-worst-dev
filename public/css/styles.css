@@ -410,3 +410,61 @@ footer {
     animation: glitch-text 0.3s infinite;
     color: #00ffff;
 }
+
+/* Loading indicator */
+.loading-cursor {
+    position: relative;
+}
+
+.loading-cursor::before {
+    content: "";
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.5);
+    z-index: 10;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.loading-cursor::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 24px;
+    height: 24px;
+    margin-top: -12px;
+    margin-left: -12px;
+    border-radius: 50%;
+    border: 3px solid #f3f3f3;
+    border-top: 3px solid #3498db;
+    z-index: 11;
+    animation: spin 1s linear infinite;
+}
+
+@keyframes spin {
+    0% {
+        transform: rotate(0deg);
+    }
+
+    100% {
+        transform: rotate(360deg);
+    }
+}
+
+.modal-frozen {
+    pointer-events: none;
+    opacity: 0.8;
+}
+
+.not-responding {
+    font-size: 0.8rem;
+    opacity: 0.8;
+    font-weight: normal;
+    margin-left: 10px;
+    font-style: italic;
+}
