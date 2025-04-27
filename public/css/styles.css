@@ -248,3 +248,165 @@ footer {
     font-size: 0.8rem;
     color: var(--footer-color);
 }
+
+/* Estilos para o modal de termos com erro */
+.error-screen {
+    padding: 0;
+    overflow: hidden;
+    max-width: 650px;
+}
+
+.error-header {
+    background-color: #d32f2f;
+    color: white;
+    padding: 15px 30px;
+    border-top-left-radius: 5px;
+    border-top-right-radius: 5px;
+}
+
+.error-header h2 {
+    margin: 0;
+    display: flex;
+    align-items: center;
+    font-size: 1.5rem;
+}
+
+.error-code {
+    font-family: 'Courier New', monospace;
+    font-size: 1.8rem;
+    margin-right: 10px;
+    font-weight: bold;
+}
+
+.error-body {
+    padding: 25px 30px;
+}
+
+.error-icon {
+    font-size: 3rem;
+    text-align: center;
+    margin-bottom: 15px;
+}
+
+.error-message-large {
+    font-size: 1.3rem;
+    text-align: center;
+    margin-bottom: 20px;
+    font-weight: bold;
+}
+
+.error-details {
+    font-family: 'Courier New', monospace;
+    background-color: rgba(0, 0, 0, 0.1);
+    padding: 10px;
+    border-radius: 3px;
+    color: #ff6b6b;
+    margin-bottom: 15px;
+}
+
+.stack-trace {
+    font-family: 'Courier New', monospace;
+    font-size: 0.9rem;
+    background-color: #222;
+    padding: 15px;
+    border-radius: 3px;
+    color: #f8f8f8;
+    overflow-x: auto;
+    margin-bottom: 20px;
+}
+
+.error-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.error-actions button {
+    flex: 1;
+}
+
+#refresh-terms {
+    background-color: #666;
+    color: white;
+}
+
+#refresh-terms:hover {
+    background-color: #777;
+}
+
+/* Notificação de erro flutuante */
+.error-notification {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    background-color: #d32f2f;
+    color: white;
+    padding: 15px 20px;
+    border-radius: 4px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.3);
+    z-index: 9999;
+    opacity: 0;
+    transform: translateY(-20px);
+    transition: opacity 0.3s, transform 0.3s;
+}
+
+/* Efeito de glitch para o último nível de erro */
+@keyframes glitch {
+    0% {
+        transform: translate(0);
+    }
+
+    20% {
+        transform: translate(-3px, 3px);
+    }
+
+    40% {
+        transform: translate(-3px, -3px);
+    }
+
+    60% {
+        transform: translate(3px, 3px);
+    }
+
+    80% {
+        transform: translate(3px, -3px);
+    }
+
+    100% {
+        transform: translate(0);
+    }
+}
+
+@keyframes glitch-text {
+    0% {
+        text-shadow: 1px 0 #ff00ff, -1px 0 #00ffff;
+    }
+
+    25% {
+        text-shadow: -1px 0 #ff00ff, 1px 0 #00ffff;
+    }
+
+    50% {
+        text-shadow: 1px 0 #00ffff, -1px 0 #ff00ff;
+    }
+
+    75% {
+        text-shadow: -1px 0 #00ffff, 1px 0 #ff00ff;
+    }
+
+    100% {
+        text-shadow: 1px 0 #ff00ff, -1px 0 #00ffff;
+    }
+}
+
+.glitch {
+    animation: glitch 0.2s infinite;
+}
+
+.glitch h2 {
+    animation: glitch-text 0.3s infinite;
+}
+
+.glitch .error-code {
+    animation: glitch-text 0.3s infinite;
+    color: #00ffff;
+}

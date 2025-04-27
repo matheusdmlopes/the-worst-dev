@@ -85,18 +85,27 @@
     </div>
 
     <div id="terms-modal" class="modal">
-        <div class="modal-content">
+        <div class="modal-content error-screen">
             <span class="close">&times;</span>
-            <h2>Termos de Uso Absurdos</h2>
-            <p>Ao se inscrever nesta competição, você concorda com o seguinte:</p>
-            <ol>
-                <li>Seu código será julgado pela sua capacidade de ser incompreensível e ineficiente.</li>
-                <li>Você será avaliado pela sua habilidade de frustrar outros desenvolvedores.</li>
-                <li>Todo bug será considerado uma "feature especial".</li>
-                <li>Quanto mais erros seu código tiver, mais pontos você ganha.</li>
-                <li>Comentários no código serão penalizados, a menos que sejam completamente enganosos.</li>
-            </ol>
-            <button id="accept-terms">Aceito estes termos absurdos</button>
+            <div class="error-header">
+                <h2><span class="error-code">500</span> Internal Server Error</h2>
+            </div>
+            <div class="error-body">
+                <div class="error-icon">⚠️</div>
+                <p class="error-message-large">Ops! Não foi possível carregar os termos de uso</p>
+                <p class="error-details">Exception in thread "main" java.lang.NullPointerException: Cannot invoke
+                    "String.length()" because "termsOfService" is null</p>
+                <pre class="stack-trace">
+at com.theworstdev.terms.TermsService.loadTerms(TermsService.java:42)
+at com.theworstdev.controllers.ModalController.showTerms(ModalController.java:31)
+at com.theworstdev.ui.Modal.display(Modal.java:89)
+at javascript.popup.onClick(unknown source)
+                </pre>
+                <div class="error-actions">
+                    <button id="accept-terms">Aceitar mesmo assim</button>
+                    <button id="refresh-terms">Tentar novamente</button>
+                </div>
+            </div>
         </div>
     </div>
 
