@@ -126,7 +126,6 @@ function setupTermsModal() {
     const modal = document.getElementById('terms-modal');
     const termsLink = document.getElementById('terms-link');
     const closeBtn = document.querySelector('.close');
-    const acceptBtn = document.getElementById('accept-terms');
     const refreshBtn = document.getElementById('refresh-terms');
     const modalContent = document.querySelector('.modal-content');
 
@@ -277,29 +276,6 @@ Stack Trace:
         } else {
             modal.style.display = 'none';
             // NÃO resetamos o contador ao fechar
-        }
-    });
-
-    acceptBtn.addEventListener('click', () => {
-        // 50% de chance de não fechar o modal
-        if (Math.random() > 0.5) {
-            modal.style.display = 'none';
-            // NÃO resetamos o contador ao fechar
-        } else {
-            // Mudar o texto do botão
-            acceptBtn.textContent = 'Aceitando...';
-
-            // Adicionar uma classe de erro no botão após vários cliques
-            if (acceptBtn.dataset.clicks === undefined) {
-                acceptBtn.dataset.clicks = 1;
-            } else {
-                acceptBtn.dataset.clicks = parseInt(acceptBtn.dataset.clicks) + 1;
-                if (acceptBtn.dataset.clicks >= 3) {
-                    acceptBtn.style.backgroundColor = '#888';
-                    acceptBtn.disabled = true;
-                    acceptBtn.textContent = 'Botão temporariamente indisponível';
-                }
-            }
         }
     });
 
