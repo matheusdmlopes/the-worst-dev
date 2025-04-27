@@ -1,7 +1,6 @@
 // Script principal
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('Aplicação inicializada');
 
     // Configurar os manipuladores de eventos do formulário
     setupFormHandlers();
@@ -245,7 +244,7 @@ Stack Trace:
     // Função para aplicar os efeitos visuais do estado "travado" final
     function applyFinalErrorState() {
         // Revelar dica no console
-        console.log("%c🧠 DICA SECRETA: Não existe termos de uso de verdade!", "color:red; font-size:20px; font-weight:bold");
+        console.log("%c🧠 DICA: Não existe termos de uso de verdade!", "color:red; font-size:20px; font-weight:bold");
 
         // Obter referências aos elementos
         const refreshButton = document.getElementById('refresh-terms');
@@ -297,8 +296,6 @@ Stack Trace:
         if (window.termsAttemptCount >= maxAttempts - 1) {
             applyFinalErrorState();
         }
-
-        console.log(`Modal de termos aberto - estado atual: ${window.termsAttemptCount}`);
     });
 
     // Botão de fechar
@@ -320,11 +317,8 @@ Stack Trace:
 
             // Se já estiver no estado final, não fazer nada
             if (currentState >= maxAttempts - 1) {
-                console.log("Estado final, ignorando clique");
                 return;
             }
-
-            console.log(`Clique em Tentar Novamente - Estado atual: ${currentState}`);
 
             // Desabilitar o botão
             e.target.disabled = true;
@@ -337,8 +331,6 @@ Stack Trace:
             setTimeout(function () {
                 // Atualizar o estado global
                 window.termsAttemptCount++;
-
-                console.log(`Avançando para estado: ${window.termsAttemptCount}`);
 
                 // Obter referência ao corpo do erro
                 const errorBody = document.querySelector('.error-body');
