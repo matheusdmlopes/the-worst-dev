@@ -7,6 +7,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Configurar o modal de termos
     setupTermsModal();
+
+    // Inicializar a variável para rastrear o último campo com erro
+    window.lastErrorField = null;
 });
 
 /**
@@ -23,8 +26,24 @@ function setupFormHandlers() {
         // Limpar mensagens de erro anteriores
         clearAllErrors();
 
-        // Simulação de validação - sempre encontra erros
-        validateForm();
+        // Mostrar um indicador visual de "processando" para dar a impressão de validação
+        const submitButton = document.getElementById('submit-button');
+        if (submitButton) {
+            submitButton.disabled = true;
+            submitButton.textContent = 'Processando...';
+        }
+
+        // Adicionar um pequeno delay para dar a impressão de que está validando
+        setTimeout(() => {
+            // Simulação de validação - sempre encontra um erro
+            validateForm();
+
+            // Restaurar o botão de envio
+            if (submitButton) {
+                submitButton.disabled = false;
+                submitButton.textContent = 'Enviar Inscrição';
+            }
+        }, Math.random() * 300 + 200); // Delay aleatório entre 200-500ms
     });
 
     // Manipulador para o botão de reset
@@ -40,10 +59,9 @@ function setupFormHandlers() {
 }
 
 /**
- * Simula a validação do formulário
+ * Simula a validação do formulário - mostra apenas um erro por vez
  */
 function validateForm() {
-    let errorCount = 0;
     const errorMessages = {
         name: [
             'Já existe um inscrito com esse nome.',
@@ -59,37 +77,43 @@ function validateForm() {
         ],
         experience: [
             'Este número de anos de experiência já foi utilizado por outro inscrito.',
-            'Ano incorreto, tente novamente.',
+            'Ano(s) de experiência incorreto, tente novamente.',
         ],
         language: [
-            'segmentation fault (core dumped)'
+            'Esta linguagem já é a favorita de outro inscrito, por favor, escolha outra.',
         ],
         terms: [
             'Você precisa aceitar novamente os termos.'
         ]
     };
 
-    // Gerar erros aleatórios
-    Object.keys(errorMessages).forEach(field => {
-        // 70% de chance de gerar um erro para cada campo
-        if (Math.random() < 0.7) {
-            const randomError = errorMessages[field][Math.floor(Math.random() * errorMessages[field].length)];
+    // Obter todos os campos possíveis
+    const allFields = Object.keys(errorMessages);
 
-            const errorElement = document.getElementById(`${field}-error`);
-            if (errorElement) {
-                errorElement.textContent = randomError;
-                errorCount++;
-            }
-        }
-    });
+    // Filtrar o último campo com erro para evitar repetição
+    const availableFields = window.lastErrorField ?
+        allFields.filter(field => field !== window.lastErrorField) :
+        allFields;
+
+    // Escolher um campo aleatório disponível
+    const randomIndex = Math.floor(Math.random() * availableFields.length);
+    const selectedField = availableFields[randomIndex];
+
+    // Escolher uma mensagem de erro aleatória para o campo selecionado
+    const possibleErrors = errorMessages[selectedField];
+    const randomError = possibleErrors[Math.floor(Math.random() * possibleErrors.length)];
+
+    // Exibir o erro apenas neste campo
+    const errorElement = document.getElementById(`${selectedField}-error`);
+    if (errorElement) {
+        errorElement.textContent = randomError;
+    }
+
+    // Atualizar o último campo com erro para a próxima validação
+    window.lastErrorField = selectedField;
 
     // Mostrar mensagem geral de erro
-    if (errorCount > 0) {
-        showError(`Seu formulário contém ${errorCount} erros que precisam ser corrigidos.`);
-    } else {
-        // Mesmo se não houver erros específicos, ainda encontramos algum motivo genérico
-        showError('Não foi possível processar seu formulário devido a um erro inesperado. Tente novamente mais tarde.');
-    }
+    showError(`Seu formulário contém 1 erro que precisa ser corrigido.`);
 }
 
 /**
@@ -186,7 +210,6 @@ Stack Trace:
         if (errorHeader) errorHeader.style.visibility = 'hidden';
         if (errorBody) errorBody.style.visibility = 'hidden';
 
-        // Remover o carregamento após 1.5 segundos e mostrar o conteúdo
         setTimeout(() => {
             // Verificar se o elemento ainda existe (pode ter sido removido se o modal for fechado rapidamente)
             if (document.contains(loadingElement)) {
@@ -204,7 +227,7 @@ Stack Trace:
                     }
                 }, 300);
             }
-        }, 1500);
+        }, 5000);
     }
 
     // Função para atualizar o erro exibido com base no estado atual
@@ -274,7 +297,7 @@ Stack Trace:
             setTimeout(() => {
                 modal.style.display = 'none';
             }, 1000);
-        }, 4000);
+        }, 6000);
     }
 
     // Abrir modal de termos
@@ -358,7 +381,7 @@ Stack Trace:
                     // Atualizar mensagens de erro
                     updateErrorMessages();
                 }
-            }, 2000);
+            }, 5000);
         }
     });
 
