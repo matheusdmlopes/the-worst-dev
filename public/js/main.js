@@ -126,17 +126,12 @@ function setupTermsModal() {
     const modal = document.getElementById('terms-modal');
     const termsLink = document.getElementById('terms-link');
     const closeBtn = document.querySelector('.close');
-    const refreshBtn = document.getElementById('refresh-terms');
     const modalContent = document.querySelector('.modal-content');
 
-    // Usar uma variável que persista entre aberturas do modal
-    // Se não existir, inicializa com 0
-    if (!window.termsAttemptCount) {
-        window.termsAttemptCount = 0;
-    }
+    // Estado inicial - reset quando a página é carregada
+    window.termsAttemptCount = 0;
 
-    // Referência ao contador para facilitar a leitura
-    let attemptCount = window.termsAttemptCount;
+    // Configurações
     const maxAttempts = 3;
 
     // Garantir que o modal esteja inicialmente oculto
@@ -170,7 +165,7 @@ Stack Trace:
 
     const errorCodes = ['500', '400', '418'];
 
-    // Função para criar e exibir o carregamento inicial
+    // Função para mostrar loading inicial quando o modal é aberto
     function showInitialLoading() {
         // Criar elemento de carregamento
         const loadingElement = document.createElement('div');
@@ -213,62 +208,100 @@ Stack Trace:
         }, 1500);
     }
 
-    // Função para atualizar o estado do modal com base no nível atual
-    function updateModalState() {
+    // Função para atualizar o erro exibido com base no estado atual
+    function updateErrorMessages() {
+        const state = window.termsAttemptCount;
         const errorDetails = document.querySelector('.error-details');
         const stackTrace = document.querySelector('.stack-trace');
         const errorCode = document.querySelector('.error-code');
 
-        // Verificar se os elementos existem antes de atualizar
         if (errorDetails && stackTrace && errorCode) {
-            // Atualizar a mensagem de erro e stack trace com base no attemptCount
-            const index = Math.min(attemptCount, maxAttempts - 1);
-            errorDetails.textContent = errorMessages[index];
-            stackTrace.textContent = stackTraces[index];
-            errorCode.textContent = errorCodes[index];
-
-            // Se estiver no último nível (loading)
-            if (attemptCount >= maxAttempts - 1) {
-                // Desabilitar todos os botões
-                document.querySelectorAll('#terms-modal button').forEach(btn => {
-                    btn.disabled = true;
-                });
-
-                // Configurar o botão "Tentar novamente"
-                if (refreshBtn) {
-                    refreshBtn.disabled = true;
-                    refreshBtn.textContent = 'Servidor não está respondendo';
-                }
-
-                // Adicionar efeito de cursor de loading
-                modalContent.classList.add('loading-cursor', 'modal-frozen');
-
-                // Atualizar o título com "Não respondendo"
-                const headerTitle = document.querySelector('.error-header h2');
-                if (headerTitle) {
-                    headerTitle.innerHTML = `<span class="error-code">${errorCodes[index]}</span> Internal Server Error <span class="not-responding">(Não respondendo)</span>`;
-                }
-            }
+            errorDetails.textContent = errorMessages[state];
+            stackTrace.textContent = stackTraces[state];
+            errorCode.textContent = errorCodes[state];
         }
     }
 
+    // Função para mostrar o loading do botão "tentar novamente"
+    function showRetryLoading() {
+        // Capturar o corpo do erro
+        const errorBody = document.querySelector('.error-body');
+
+        // Guardar o conteúdo original
+        const originalContent = errorBody.innerHTML;
+
+        // Substituir com o indicador de carregamento
+        errorBody.innerHTML = `
+            <div style="display: flex; flex-direction: column; align-items: center; justify-content: center; height: 200px;">
+                <div class="loading-spinner"></div>
+                <div class="loading-text" style="margin-top: 15px;">Tentando reconectar ao servidor...</div>
+            </div>
+        `;
+
+        // Retornar o conteúdo original para ser restaurado depois
+        return originalContent;
+    }
+
+    // Função para aplicar os efeitos visuais do estado "travado" final
+    function applyFinalErrorState() {
+        // Revelar dica no console
+        console.log("%c🧠 DICA SECRETA: Não existe termos de uso de verdade!", "color:red; font-size:20px; font-weight:bold");
+
+        // Obter referências aos elementos
+        const refreshButton = document.getElementById('refresh-terms');
+        const headerTitle = document.querySelector('.error-header h2');
+
+        // Desabilitar o botão
+        if (refreshButton) {
+            refreshButton.disabled = true;
+            refreshButton.textContent = 'Servidor não está respondendo';
+        }
+
+        // Adicionar efeitos visuais de travamento
+        modalContent.classList.add('loading-cursor', 'modal-frozen');
+
+        // Atualizar o título
+        if (headerTitle) {
+            const state = window.termsAttemptCount;
+            headerTitle.innerHTML = `<span class="error-code">${errorCodes[state]}</span> Internal Server Error <span class="not-responding">(Não respondendo)</span>`;
+        }
+
+        // Configurar o fechamento automático após alguns segundos
+        setTimeout(() => {
+            // Simular mensagem de crash
+            showErrorNotification("A janela de termos de uso parou de responder e será fechada");
+
+            // Fechar o modal após a notificação
+            setTimeout(() => {
+                modal.style.display = 'none';
+            }, 1000);
+        }, 4000);
+    }
+
+    // Abrir modal de termos
     termsLink.addEventListener('click', (e) => {
         e.preventDefault();
 
         // Exibir o modal
         modal.style.display = 'block';
 
-        // Mostrar carregamento inicial (apenas se não estiver no último nível com loading)
-        if (attemptCount < maxAttempts - 1) {
+        // Se não for o estado final, mostrar loading inicial
+        if (window.termsAttemptCount < maxAttempts - 1) {
             showInitialLoading();
         }
 
-        // Atualizar o estado do modal quando aberto
-        updateModalState();
+        // Atualizar as mensagens de erro
+        updateErrorMessages();
 
-        console.log('Modal de termos aberto');
+        // Se for o estado final, aplicar efeitos especiais
+        if (window.termsAttemptCount >= maxAttempts - 1) {
+            applyFinalErrorState();
+        }
+
+        console.log(`Modal de termos aberto - estado atual: ${window.termsAttemptCount}`);
     });
 
+    // Botão de fechar
     closeBtn.addEventListener('click', () => {
         // 60% chance do botão fechar não funcionar
         if (Math.random() < 0.6) {
@@ -279,38 +312,63 @@ Stack Trace:
         }
     });
 
-    if (refreshBtn) {
-        refreshBtn.addEventListener('click', () => {
-            // Se já estiver no nível máximo, não fazer nada
-            if (attemptCount >= maxAttempts - 1) return;
+    // Botão "Tentar novamente" - implementação mais simples e direta
+    document.addEventListener('click', function (e) {
+        // Verificar se o clique foi no botão "Tentar novamente"
+        if (e.target && e.target.id === 'refresh-terms') {
+            const currentState = window.termsAttemptCount;
 
-            // Incrementar o contador e atualizar a variável global
-            attemptCount = Math.min(attemptCount + 1, maxAttempts - 1);
-            window.termsAttemptCount = attemptCount;
-
-            // Atualizar o estado do modal
-            updateModalState();
-
-            // Se for o último erro (terceira tentativa), simular o travamento
-            if (attemptCount >= maxAttempts - 1) {
-                // Revelar uma "pista" engraçada no console
-                console.log("%c🧠 DICA SECRETA: Não existe termos de uso de verdade!", "color:red; font-size:20px; font-weight:bold");
-
-                // Esperar alguns segundos e fechar o modal
-                setTimeout(() => {
-                    // Simular uma mensagem de crash antes de fechar
-                    showErrorNotification("A janela de termos de uso parou de responder e será fechada");
-
-                    // Fechar o modal após mostrar a notificação
-                    setTimeout(() => {
-                        modal.style.display = 'none';
-
-                        // NÃO resetamos o contador nem removemos as classes
-                    }, 1000);
-                }, 4000);
+            // Se já estiver no estado final, não fazer nada
+            if (currentState >= maxAttempts - 1) {
+                console.log("Estado final, ignorando clique");
+                return;
             }
-        });
-    }
+
+            console.log(`Clique em Tentar Novamente - Estado atual: ${currentState}`);
+
+            // Desabilitar o botão
+            e.target.disabled = true;
+            e.target.textContent = 'Conectando...';
+
+            // Mostrar loading
+            const originalContent = showRetryLoading();
+
+            // Após 2 segundos, avançar para o próximo estado
+            setTimeout(function () {
+                // Atualizar o estado global
+                window.termsAttemptCount++;
+
+                console.log(`Avançando para estado: ${window.termsAttemptCount}`);
+
+                // Obter referência ao corpo do erro
+                const errorBody = document.querySelector('.error-body');
+
+                // Restaurar o conteúdo original
+                errorBody.innerHTML = originalContent;
+
+                // Obter novas referências
+                const refreshBtn = document.getElementById('refresh-terms');
+
+                // Se for o estado final
+                if (window.termsAttemptCount >= maxAttempts - 1) {
+                    // Atualizar mensagens de erro
+                    updateErrorMessages();
+
+                    // Aplicar efeitos do estado final
+                    applyFinalErrorState();
+                } else {
+                    // Restaurar o botão para estados não-finais
+                    if (refreshBtn) {
+                        refreshBtn.disabled = false;
+                        refreshBtn.textContent = 'Tentar novamente';
+                    }
+
+                    // Atualizar mensagens de erro
+                    updateErrorMessages();
+                }
+            }, 2000);
+        }
+    });
 
     // Fechar o modal se clicar fora do conteúdo
     window.addEventListener('click', (e) => {
