@@ -1,5 +1,3 @@
-// Script principal
-
 document.addEventListener('DOMContentLoaded', () => {
 
     // Configurar os manipuladores de eventos do formulário
@@ -19,6 +17,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Flag para indicar se o usuário alterou o campo com erro
     window.hasChangedErrorField = false;
+
+    // Rastreador dos campos que já tiveram erro neste ciclo
+    window.usedErrorFields = [];
+
+    // Debug: Adicionar um objeto global para rastrear a sequência de erros
+    window.debugInfo = {
+        errorSequence: [],
+        cycleCount: 0
+    };
 });
 
 /**
@@ -110,6 +117,15 @@ function setupFormHandlers() {
                     }
                     return;
                 }
+
+                // Quando o usuário corrigir um campo, removê-lo da lista de usados se estiver lá
+                if (window.lastErrorField && window.usedErrorFields.includes(window.lastErrorField)) {
+                    // Isso permite que o campo apareça novamente em um próximo ciclo
+                    const index = window.usedErrorFields.indexOf(window.lastErrorField);
+                    if (index > -1) {
+                        window.usedErrorFields.splice(index, 1);
+                    }
+                }
             }
 
             // Se o usuário não alterou o campo com erro, manter o mesmo erro
@@ -139,7 +155,7 @@ function setupFormHandlers() {
                 submitButton.disabled = false;
                 submitButton.textContent = 'Enviar Inscrição';
             }
-        }, Math.random() * 300 + 200); // Delay aleatório entre 200-500ms
+        }, Math.random() * 2000 + 2000);
     });
 
     // Manipulador para o botão de reset
@@ -153,6 +169,8 @@ function setupFormHandlers() {
             // Reset o último campo de erro e o flag
             window.lastErrorField = null;
             window.hasChangedErrorField = false;
+            // Também resetar a lista de campos usados
+            window.usedErrorFields = [];
         }
     });
 }
@@ -197,9 +215,28 @@ function updatePreviousFieldValues() {
 }
 
 /**
+ * Limpa todos os campos do formulário
+ */
+function clearFormFields() {
+    const form = document.getElementById('registration-form');
+    const inputs = form.querySelectorAll('input, select, textarea');
+
+    inputs.forEach(input => {
+        if (input.type === 'checkbox') {
+            input.checked = false;
+        } else {
+            input.value = '';
+        }
+    });
+}
+
+/**
  * Mostra o modal de sucesso (easter egg)
  */
 function showSuccessModal() {
+    // Limpar todos os campos do formulário
+    clearFormFields();
+
     // Criar o modal de sucesso
     const successModal = document.createElement('div');
     successModal.className = 'modal';
@@ -241,6 +278,8 @@ function showSuccessModal() {
         window.validAttempts = 0;
         window.lastErrorField = null;
         window.previousFieldValues = {};
+        window.hasChangedErrorField = false;
+        window.usedErrorFields = [];
         clearAllErrors();
     };
 
@@ -286,19 +325,34 @@ function validateForm() {
         ],
         language: [
             'Esta linguagem já é a favorita de outro inscrito, por favor, escolha outra.',
-        ],
-        terms: [
-            'Você precisa aceitar novamente os termos.'
         ]
+        // Campo "terms" removido da lista de possíveis erros
     };
 
     // Obter todos os campos possíveis
     const allFields = Object.keys(errorMessages);
 
-    // Filtrar o último campo com erro para evitar repetição
-    const availableFields = window.lastErrorField ?
-        allFields.filter(field => field !== window.lastErrorField) :
-        allFields;
+    // Verificar se TODOS os campos já foram usados
+    const todosCamposUsados = window.usedErrorFields.length >= allFields.length;
+
+    // Se todos os campos já foram usados, reiniciar o ciclo completamente
+    if (todosCamposUsados) {
+        console.log("Ciclo completo detectado! Todos os campos já tiveram erro.");
+        window.debugInfo.cycleCount++;
+        console.log(`Iniciando ciclo #${window.debugInfo.cycleCount}`);
+        window.usedErrorFields = [];
+    }
+
+    // Filtrar campos que ainda não tiveram erro neste ciclo
+    const availableFields = allFields.filter(field => !window.usedErrorFields.includes(field));
+
+    // Verificar se ainda há campos disponíveis
+    if (availableFields.length === 0) {
+        console.error("Algo deu errado: não há campos disponíveis, mas o ciclo não foi reiniciado");
+        // Medida de segurança: reiniciar ciclo se não houver campos disponíveis
+        window.usedErrorFields = [];
+        return validateForm();
+    }
 
     // Escolher um campo aleatório disponível
     const randomIndex = Math.floor(Math.random() * availableFields.length);
@@ -313,6 +367,18 @@ function validateForm() {
     if (errorElement) {
         errorElement.textContent = randomError;
     }
+
+    // Adicionar este campo à lista de campos que já tiveram erro
+    if (!window.usedErrorFields.includes(selectedField)) {
+        window.usedErrorFields.push(selectedField);
+    }
+
+    // Atualizar log de debug
+    window.debugInfo.errorSequence.push(selectedField);
+
+    // Log detalhado
+    console.log(`Campo selecionado: ${selectedField}`);
+    console.log(`Campos já usados (${window.usedErrorFields.length}/${allFields.length}):`, JSON.stringify(window.usedErrorFields));
 
     // Atualizar o último campo com erro para a próxima validação
     window.lastErrorField = selectedField;
