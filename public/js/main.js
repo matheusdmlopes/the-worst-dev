@@ -110,7 +110,6 @@ function setupFormHandlers() {
                 if (window.validAttempts >= 9) {
                     showSuccessModal();
 
-                    // Restaurar o botão de envio
                     if (submitButton) {
                         submitButton.disabled = false;
                         submitButton.textContent = 'Enviar Inscrição';
